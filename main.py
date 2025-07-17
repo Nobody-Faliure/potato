@@ -2,28 +2,25 @@ import pygame
 import sys
 
 from character import Player
-from terrain import Dirt
+from terrain_builder import build_random_terrain
 
 from base import Drawable, Moveable, GameObject
 
 pygame.init()
+touching = False
 
 # Screen height, Screen width
 screen_width, screen_height = 640, 480
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Game")
 
 # Bool to break from game loop
 running = True
 
 # Make a list of objects
-terrain_objects = []
-for i in range(0, 63):
-    terrain_objects.append(Dirt(i * 20, 460, screen))
-    terrain_objects.append(Dirt(i * 20, 440, screen))
-player = Player(320, 240, screen, terrain_objects)
-objects = terrain_objects + [player]
+terrain_objects = build_random_terrain(screen)
 
+player = Player(320, 120, screen, terrain_objects, 1, 7, True)
+objects = terrain_objects + [player]
 
 # Clock
 Clock = pygame.time.Clock()
@@ -46,37 +43,6 @@ while running:
     drawables = list(filter(lambda obj: isinstance(obj, Drawable), objects))
     for drawable in drawables:
         drawable.draw()
-
-
-
-
-
-    # player and block should have common base class
-    # class Drawable: draw
-    # class Movable: move, collide
-    # class Collidable: getHitBox
-    # class Character(Drawable, Movable)
-    # class Dirt(Drawable)
-
-    # put all sprite in single array sprites
-    #
-    # collidables = filter(lambda x: issubclass(sprite, Collidable), sprites)
-    # in main loop do
-    # for sprite in sprites:
-    #     process collide
-    #     if issubclass(sprite, Movable):
-    #         sprite.collide(collidables)
-    #         sprite.move()
-    #     process moves
-    #     if issubclass(sprite, Drawable):
-    #          sprite.draw()
-
-    #     if issubclass(sprite, Drawable):
-    #          sprite.draw()
-
-    # for movable in movables:
-    #   movable.collide(
-    #   movable.move
 
     pygame.display.flip()
 
