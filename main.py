@@ -16,11 +16,11 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 # Bool to break from game loop
 running = True
 
-# Make a list of objects
-terrain_objects = build_random_terrain(screen)
+# Create Level
+level = build_random_terrain(screen)
 
-player = Player(320, 120, screen, terrain_objects, 1, 15)
-objects = terrain_objects + [player]
+# Create Player
+player = Player(320, 120, screen, level, 1, 15)
 
 # Clock
 Clock = pygame.time.Clock()
@@ -34,15 +34,9 @@ while running:
 
     screen.fill((135, 206, 235))
 
-    # process movables
-    movables = list(filter(lambda obj: isinstance(obj, Moveable), objects))
-    for movable in movables:
-        movable.move()
-
-    # process drawables
-    drawables = list(filter(lambda obj: isinstance(obj, Drawable), objects))
-    for drawable in drawables:
-        drawable.draw()
+    player.move()
+    player.draw()
+    level.draw()
 
     pygame.display.flip()
 

@@ -6,12 +6,10 @@ import pygame
 
 BLOCK_SIZE = 20
 
-class TerrainObject(GameObject, Collidable):
-    @abstractmethod
-    def get_box(self) -> pygame.Rect:
-        pass
+class TerrainObject(Drawable, Collidable, GameObject):
+    pass
 
-class Dirt(Drawable, TerrainObject):
+class Dirt(TerrainObject):
     def __init__(self, x: int , y: int, screen: pygame.Surface, _is_grass):
         self._x = x
         self._y = y
@@ -30,7 +28,7 @@ class Dirt(Drawable, TerrainObject):
         else:
             self._screen.blit(self._image, self._box)
 
-class Stone(Drawable, TerrainObject):
+class Stone(TerrainObject):
     def __init__(self, x: int , y: int, screen: pygame.Surface):
         self._x = x
         self.y = y
@@ -44,7 +42,7 @@ class Stone(Drawable, TerrainObject):
     def draw(self):
         self._screen.blit(self._image, self._box)
 
-class Tree(Drawable, TerrainObject):
+class Tree(TerrainObject):
     def __init__(self, x: int, y: int, screen: pygame.Surface):
         self._x = x
         self.y = y

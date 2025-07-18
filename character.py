@@ -6,11 +6,12 @@ from base import Drawable, Moveable, Collidable, GameObject
 from terrain import TerrainObject
 
 from enum import Enum
+from level import Level
 
 PLAYER_WIDTH = 15
 PLAYER_HEIGHT = 30
 
-class Player(Drawable, Moveable, GameObject, Collidable):
+class Player(Drawable, Moveable, Collidable, GameObject):
     class State(Enum):
         ON_THE_GROUND = 0
         IN_THE_AIR = 1
@@ -19,13 +20,13 @@ class Player(Drawable, Moveable, GameObject, Collidable):
                  x: float,
                  y: float,
                  screen: pygame.Surface,
-                 terrain_objects: list[TerrainObject],
+                 level: Level,
                  gravity_acceleration: float,
                  jump_initial_velocity: float):
         self._state = self.State.IN_THE_AIR
         self._gravity_acceleration = gravity_acceleration
         self._box = pygame.Rect(x, y, PLAYER_WIDTH, PLAYER_HEIGHT)
-        self._terrain_objects = terrain_objects
+        self._level = level
         self._screen = screen
         self._jump_initial_velocity = jump_initial_velocity
         self._x_velocity = 0
@@ -85,16 +86,11 @@ class Player(Drawable, Moveable, GameObject, Collidable):
             self._state = self.State.IN_THE_AIR
             self._y_velocity = self._jump_initial_velocity * -1
 
-    def collide_with_any_terrain_object(self):
-        for terrain_object in self._terrain_objects:
-            if self.collide(terrain_object):
-                return True
-        return False
 
     def process_jumping_and_collision(self):
         # move horizontal
         self.get_box().move_ip(self._x_velocity, 0)
-        if self.collide_with_any_terrain_object():
+        if self._level.collide(self):
             # revert the move
             self.get_box().move_ip(-self._x_velocity, 0)
             # find maximum x delta
@@ -102,7 +98,7 @@ class Player(Drawable, Moveable, GameObject, Collidable):
             step_x = (self._x_velocity > 0) - (self._x_velocity < 0)
             while self.get_box().x < target_x and step_x != 0:
                 self._box.move_ip(0, step_x)
-                if self.collide_with_any_terrain_object():
+                if self._level.collide(self):
                     self._box.move_ip(0, -step_x)
                     break
 
@@ -110,7 +106,7 @@ class Player(Drawable, Moveable, GameObject, Collidable):
         if self._state == self.State.IN_THE_AIR:
             self._y_velocity += self._gravity_acceleration
         self.get_box().move_ip(0, self._y_velocity)
-        if self.collide_with_any_terrain_object():
+        if self._level.collide(self):
             self._state = self.State.ON_THE_GROUND
             # revert the move
             self.get_box().move_ip(0, -self._y_velocity)
@@ -119,7 +115,7 @@ class Player(Drawable, Moveable, GameObject, Collidable):
             step_y = (self._y_velocity > 0) - (self._y_velocity < 0)
             while self._box.y < target_y and step_y != 0:
                 self._box.move_ip(0, step_y)
-                if self.collide_with_any_terrain_object():
+                if self._level.collide(self):
                     self._box.move_ip(0, -step_y)
                     if step_y > 0:
                         self._y_velocity = self._gravity_acceleration
