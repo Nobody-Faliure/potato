@@ -19,7 +19,7 @@ running = True
 # Make a list of objects
 terrain_objects = build_random_terrain(screen)
 
-player = Player(320, 120, screen, terrain_objects, 1, 7, True)
+player = Player(320, 120, screen, terrain_objects, 1, 15)
 objects = terrain_objects + [player]
 
 # Clock

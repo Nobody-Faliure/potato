@@ -1,14 +1,14 @@
 from abc import abstractmethod
 
-from base import Drawable, GameObject
+from base import Drawable, GameObject, Collidable
 
 import pygame
 
 BLOCK_SIZE = 20
 
-class TerrainObject(GameObject):
+class TerrainObject(GameObject, Collidable):
     @abstractmethod
-    def getBox(self) -> pygame.Rect:
+    def get_box(self) -> pygame.Rect:
         pass
 
 class Dirt(Drawable, TerrainObject):
@@ -21,7 +21,7 @@ class Dirt(Drawable, TerrainObject):
         self._grass_image = pygame.image.load("sprites/grass.png").convert_alpha()
         self._is_grass = _is_grass
 
-    def getBox(self) -> pygame.Rect:
+    def get_box(self) -> pygame.Rect:
         return self._box
 
     def draw(self):
@@ -38,7 +38,7 @@ class Stone(Drawable, TerrainObject):
         self._screen = screen
         self._image = pygame.image.load("sprites/stone.png").convert_alpha()
 
-    def getBox(self):
+    def get_box(self):
         return self._box
 
     def draw(self):
@@ -52,7 +52,7 @@ class Tree(Drawable, TerrainObject):
         self._screen = screen
         self._image = pygame.image.load("sprites/tree.png").convert_alpha()
 
-    def getBox(self):
+    def get_box(self):
         return self._box
 
     def draw(self):
