@@ -1,9 +1,7 @@
-import sys
-
 import pygame
 
 from base import Collidable, Drawable, GameObject
-from terrain import TerrainObject
+from terrain import TerrainObject, Magma
 
 AREA_SIZE = 100
 
@@ -11,8 +9,8 @@ def _encode_area_key(area_coord_x: int, area_coord_y: int) -> int:
     return area_coord_x * 256 + area_coord_y
 
 class Level(Drawable, GameObject):
-    def __init__(self, level_height: float, level_width: float, screen: pygame.Surface,):
-        self._level_box = pygame.Rect(0, 0, level_width, level_height)
+    def __init__(self, level_height: float, level_width: float, screen: pygame.Surface, level_box: pygame.Rect):
+        self._level_box = level_box
         self._objects_map = dict[int, list[TerrainObject]]()
         self._max_area_coord_x = int((level_width - 1) // AREA_SIZE)
         self._max_area_coord_y = int((level_height - 1) // AREA_SIZE)
@@ -51,4 +49,6 @@ class Level(Drawable, GameObject):
             for terrain_object in terrain_objects:
                 terrain_object.draw()
 
+    def get_box(self) -> pygame.Rect:
+        return self._level_box
 

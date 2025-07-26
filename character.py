@@ -3,7 +3,7 @@
 import pygame
 
 from base import Drawable, Moveable, Collidable, GameObject
-from terrain import TerrainObject
+from screen_proxy import ScreenProxy
 
 from enum import Enum
 from level import Level
@@ -22,7 +22,8 @@ class Player(Drawable, Moveable, Collidable, GameObject):
                  screen: pygame.Surface,
                  level: Level,
                  gravity_acceleration: float,
-                 jump_initial_velocity: float):
+                 jump_initial_velocity: float,
+                 screen_proxy : ScreenProxy):
         self._state = self.State.IN_THE_AIR
         self._gravity_acceleration = gravity_acceleration
         self._box = pygame.Rect(x, y, PLAYER_WIDTH, PLAYER_HEIGHT)
@@ -46,33 +47,34 @@ class Player(Drawable, Moveable, Collidable, GameObject):
         ]
         self._left_frame_index = 0
         self._right_frame_index = 0
+        self._screen_proxy = screen_proxy
 
 
-    def draw(self):
+    def draw(self) -> None:
         if self._x_velocity < 0:
-            self._screen.blit(
+            self._screen_proxy.blit(
                 self._left_frames[self._left_frame_index // 5],
-                (self._box.x - 8, self._box.y + 2)
+                self._box.x - 8, self._box.y + 2
             )
         elif self._x_velocity > 0:
-            self._screen.blit(
+            self._screen_proxy.blit(
                 self._right_frames[self._right_frame_index // 5],
-                (self._box.x - 8, self._box.y + 2)
+                self._box.x - 8, self._box.y + 2
             )
         else:
-            self._screen.blit(
+            self._screen_proxy.blit(
                 self._standby_image,
-                (self._box.x - 8, self._box.y + 2)
+                self._box.x - 8, self._box.y + 2
             )
 
-    def move(self):
+    def move(self) -> None:
         self.process_jumping_and_collision()
         self.process_user_input()
 
     def get_box(self) -> pygame.Rect:
         return self._box
 
-    def process_user_input(self):
+    def process_user_input(self) -> None:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             self._left_frame_index = (self._left_frame_index + 1) % 20
@@ -86,8 +88,7 @@ class Player(Drawable, Moveable, Collidable, GameObject):
             self._state = self.State.IN_THE_AIR
             self._y_velocity = self._jump_initial_velocity * -1
 
-
-    def process_jumping_and_collision(self):
+    def process_jumping_and_collision(self) -> None:
         # move horizontal
         self.get_box().move_ip(self._x_velocity, 0)
         if self._level.collide(self):
