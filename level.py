@@ -9,14 +9,13 @@ def _encode_area_key(area_coord_x: int, area_coord_y: int) -> int:
     return area_coord_x * 256 + area_coord_y
 
 class Level(Drawable, GameObject):
-    def __init__(self, level_height: float, level_width: float, screen: pygame.Surface, level_box: pygame.Rect):
+    def __init__(self, level_height: float, level_width: float, level_box: pygame.Rect):
         self._level_box = level_box
         self._objects_map = dict[int, list[TerrainObject]]()
         self._max_area_coord_x = int((level_width - 1) // AREA_SIZE)
         self._max_area_coord_y = int((level_height - 1) // AREA_SIZE)
-        self._screen = screen
 
-    def add_terrain_object(self, terrain_objects: list[TerrainObject]):
+    def add_terrain_objects(self, terrain_objects: list[TerrainObject]):
         terrain_object_boxes = list(map(lambda x: x.get_box(), terrain_objects))
         # if all terrain objects in level box
         if self._level_box.unionall(terrain_object_boxes) != self._level_box:

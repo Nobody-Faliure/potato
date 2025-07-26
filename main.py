@@ -2,10 +2,11 @@ import pygame
 import sys
 
 from character import Player
-from terrain_builder import build_random_terrain
 
-from base import Drawable, Moveable, GameObject
+from level import Level
 from screen_proxy import ScreenProxy
+from terrain import TerrainObject
+from terrain_builder import TerrainBuilder, DirtAndStoneGroundSegment, Forest
 
 pygame.init()
 touching = False
@@ -20,7 +21,16 @@ running = True
 # Create Level
 level_box = pygame.Rect(0, 0, screen_width * 4, screen_height)
 screen_proxy = ScreenProxy(screen, level_box)
-level = build_random_terrain(screen, screen_proxy, level_box)
+builders: list[TerrainBuilder] = [
+    DirtAndStoneGroundSegment(level_box, 0, 10, 4, screen_proxy),
+    DirtAndStoneGroundSegment(level_box, 11, 10, 9, screen_proxy),
+    DirtAndStoneGroundSegment(level_box, 22, 10, 4, screen_proxy),
+    Forest(level_box, 0, 5, 10, screen_proxy),
+]
+level = Level(level_box.h, level_box.w, level_box)
+for builder in builders:
+    level.add_terrain_objects(builder.get_terrain_objects())
+
 
 # Create Player
 player = Player(320, 120, screen, level, 1, 15, screen_proxy)
