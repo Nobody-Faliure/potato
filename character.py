@@ -3,6 +3,7 @@
 import pygame
 
 from base import Drawable, Moveable, Collidable, GameObject
+from game_session import GameSession
 from screen_proxy import ScreenProxy
 
 from enum import Enum
@@ -17,16 +18,17 @@ class Player(Drawable, Moveable, Collidable, GameObject):
         IN_THE_AIR = 1
 
     def __init__(self,
-                 x: float,
-                 y: float,
                  screen: pygame.Surface,
                  level: Level,
                  gravity_acceleration: float,
                  jump_initial_velocity: float,
-                 screen_proxy : ScreenProxy):
+                 screen_proxy : ScreenProxy,
+                 game_session : GameSession):
         self._state = self.State.IN_THE_AIR
         self._gravity_acceleration = gravity_acceleration
-        self._box = pygame.Rect(x, y, PLAYER_WIDTH, PLAYER_HEIGHT)
+        self._original_x = 320
+        self._original_y = 0
+        self._box = pygame.Rect(self._original_x, self._original_y, PLAYER_WIDTH, PLAYER_HEIGHT)
         self._level = level
         self._screen = screen
         self._jump_initial_velocity = jump_initial_velocity
@@ -48,6 +50,8 @@ class Player(Drawable, Moveable, Collidable, GameObject):
         self._left_frame_index = 0
         self._right_frame_index = 0
         self._screen_proxy = screen_proxy
+        self._game_session = game_session
+        self._hp_change_value = 0
 
 
     def draw(self) -> None:
@@ -128,3 +132,19 @@ class Player(Drawable, Moveable, Collidable, GameObject):
                     break
         else:
             self._state = self.State.IN_THE_AIR
+
+    def reset(self):
+        self._box.x = self._original_x
+        self._box.y = self._original_y
+        self._x_velocity = 0
+        self._y_velocity = 0
+        self._state = self.State.IN_THE_AIR
+        self._hp_change_value = 100
+        self._game_session.change_state(GameSession.GameSessionState.IN_GAME)
+
+    def process_hp(self) -> None:
+        #void damage
+        if self._box.y >= self._level.get_box().height and self._game_session.get_state() == GameSession.GameSessionState.IN_GAME:
+            self._hp_change_value = -100
+        self._game_session.process_hp(self._hp_change_value)
+        self._hp_change_value = 0
