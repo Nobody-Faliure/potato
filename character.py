@@ -88,26 +88,28 @@ class Player(Drawable, Moveable, Collidable, GameObject):
             self._state = self.State.IN_THE_AIR
             self._y_velocity = self._jump_initial_velocity * -1
 
+    def has_collision(self) -> bool:
+        collide_with_terrain = self._level.collide(self)
+        collide_with_border = self._box.x <= 0 or self._box.x >= self._level.get_box().width - PLAYER_WIDTH
+        return collide_with_border or collide_with_terrain
+
     def process_jumping_and_collision(self) -> None:
         # move horizontal
         self.get_box().move_ip(self._x_velocity, 0)
-        if self._level.collide(self):
+        if self.has_collision():
             # revert the move
             self.get_box().move_ip(-self._x_velocity, 0)
             # find maximum x delta
             target_x = self.get_box().x + self._x_velocity
             step_x = (self._x_velocity > 0) - (self._x_velocity < 0)
             while self.get_box().x < target_x and step_x != 0:
-                print("before", self._box.x)
                 self._box.move_ip(step_x, 0)
-                print(self._box.x)
-                if self._level.collide(self):
+                if self.has_collision():
                     self._box.move_ip(-step_x, 0)
                     break
 
         # move vertically
         if self._state == self.State.IN_THE_AIR:
-            print("processing vertical")
             self._y_velocity += self._gravity_acceleration
         self.get_box().move_ip(0, self._y_velocity)
         if self._level.collide(self):

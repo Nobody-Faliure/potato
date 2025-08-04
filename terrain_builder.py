@@ -4,7 +4,6 @@ import pygame
 
 from screen_proxy import ScreenProxy
 from terrain import Dirt, Stone, Tree, Magma, TerrainObject, BLOCK_SIZE
-from level import Level
 
 class TerrainBuilder(ABC):
     def get_terrain_objects(self) -> list[TerrainObject]:

@@ -5,7 +5,6 @@ from character import Player
 
 from level import Level
 from screen_proxy import ScreenProxy
-from terrain import TerrainObject
 from terrain_builder import TerrainBuilder, DirtAndStoneGroundSegment, Forest
 
 pygame.init()
@@ -19,11 +18,11 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 running = True
 
 # Create Level
-level_box = pygame.Rect(0, 0, screen_width * 4, screen_height)
+level_box = pygame.Rect(0, 0, screen_width, screen_height)
 screen_proxy = ScreenProxy(screen, level_box)
 builders: list[TerrainBuilder] = [
     DirtAndStoneGroundSegment(level_box, 0, 10, 4, screen_proxy),
-    DirtAndStoneGroundSegment(level_box, 11, 10, 9, screen_proxy),
+    DirtAndStoneGroundSegment(level_box, 11, 10, 7, screen_proxy),
     DirtAndStoneGroundSegment(level_box, 22, 10, 4, screen_proxy),
     Forest(level_box, 0, 5, 10, screen_proxy),
 ]
@@ -33,7 +32,7 @@ for builder in builders:
 
 
 # Create Player
-player = Player(320, 120, screen, level, 1, 15, screen_proxy)
+player = Player(320, 120, screen, level, 0.98, 15, screen_proxy)
 
 # Clock
 Clock = pygame.time.Clock()
