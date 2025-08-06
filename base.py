@@ -20,7 +20,3 @@ class Drawable(GameObject):
     def draw(self):
         pass
 
-class Moveable(GameObject):
-    @abstractmethod
-    def move(self):
-        pass

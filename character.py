@@ -2,7 +2,7 @@
 
 import pygame
 
-from base import Drawable, Moveable, Collidable, GameObject
+from base import Drawable, Collidable, GameObject
 from game_session import GameSession
 from screen_proxy import ScreenProxy
 
@@ -12,10 +12,15 @@ from level import Level
 PLAYER_WIDTH = 15
 PLAYER_HEIGHT = 30
 
-class Player(Drawable, Moveable, Collidable, GameObject):
+class Player(Drawable, Collidable, GameObject):
     class State(Enum):
         ON_THE_GROUND = 0
         IN_THE_AIR = 1
+
+    class MovementKeyPressed(Enum):
+        NO_KEY = 0
+        LEFT_KEY = 1
+        RIGHT_KEY = 2
 
     def __init__(self,
                  screen: pygame.Surface,
@@ -52,50 +57,8 @@ class Player(Drawable, Moveable, Collidable, GameObject):
         self._screen_proxy = screen_proxy
         self._game_session = game_session
         self._hp_change_value = 0
-
-
-    def draw(self) -> None:
-        if self._x_velocity < 0:
-            self._screen_proxy.blit(
-                self._left_frames[self._left_frame_index // 5],
-                self._box.x - 8, self._box.y + 2
-            )
-        elif self._x_velocity > 0:
-            self._screen_proxy.blit(
-                self._right_frames[self._right_frame_index // 5],
-                self._box.x - 8, self._box.y + 2
-            )
-        else:
-            self._screen_proxy.blit(
-                self._standby_image,
-                self._box.x - 8, self._box.y + 2
-            )
-
-    def move(self) -> None:
-        self.process_jumping_and_collision()
-        self.process_user_input()
-
-    def get_box(self) -> pygame.Rect:
-        return self._box
-
-    def process_user_input(self) -> None:
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self._left_frame_index = (self._left_frame_index + 1) % 20
-            self._x_velocity = -2
-        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            self._right_frame_index = (self._right_frame_index + 1) % 20
-            self._x_velocity = + 2
-        else:
-            self._x_velocity = 0
-        if keys[pygame.K_SPACE] and self._state == self.State.ON_THE_GROUND:
-            self._state = self.State.IN_THE_AIR
-            self._y_velocity = self._jump_initial_velocity * -1
-
-    def has_collision(self) -> bool:
-        collide_with_terrain = self._level.collide(self)
-        collide_with_border = self._box.x <= 0 or self._box.x >= self._level.get_box().width - PLAYER_WIDTH
-        return collide_with_border or collide_with_terrain
+        self._death_message = None
+        self._movement_key_pressed = self.MovementKeyPressed.NO_KEY
 
     def process_jumping_and_collision(self) -> None:
         # move horizontal
@@ -111,6 +74,8 @@ class Player(Drawable, Moveable, Collidable, GameObject):
                 if self.has_collision():
                     self._box.move_ip(-step_x, 0)
                     break
+
+        self._movement_key_pressed = self.MovementKeyPressed.NO_KEY
 
         # move vertically
         if self._state == self.State.IN_THE_AIR:
@@ -133,6 +98,54 @@ class Player(Drawable, Moveable, Collidable, GameObject):
         else:
             self._state = self.State.IN_THE_AIR
 
+
+    def draw(self) -> None:
+        if self._movement_key_pressed == self.MovementKeyPressed.NO_KEY:
+            self._x_velocity = 0
+        if self._x_velocity < 0:
+            self._screen_proxy.blit(
+                self._left_frames[self._left_frame_index // 5],
+                self._box.x - 8, self._box.y + 2
+            )
+        elif self._x_velocity > 0:
+            self._screen_proxy.blit(
+                self._right_frames[self._right_frame_index // 5],
+                self._box.x - 8, self._box.y + 2
+            )
+        else:
+            self._screen_proxy.blit(
+                self._standby_image,
+                self._box.x - 8, self._box.y + 2
+            )
+
+        self.process_jumping_and_collision()
+
+    def move(self) -> None:
+        pass
+
+    def get_box(self) -> pygame.Rect:
+        return self._box
+
+    def move_left(self):
+        self._left_frame_index = (self._left_frame_index + 1) % 20
+        self._x_velocity = - 2
+        self._movement_key_pressed = self.MovementKeyPressed.LEFT_KEY
+
+    def move_right(self):
+        self._right_frame_index = (self._right_frame_index + 1) % 20
+        self._x_velocity = + 2
+        self._movement_key_pressed = self.MovementKeyPressed.LEFT_KEY
+
+    def jump(self):
+        if self._state == Player.State.ON_THE_GROUND:
+            self._state = self.State.IN_THE_AIR
+            self._y_velocity = self._jump_initial_velocity * -1
+
+    def has_collision(self) -> bool:
+        collide_with_terrain = self._level.collide(self)
+        collide_with_border = self._box.x <= 0 or self._box.x >= self._level.get_box().width - PLAYER_WIDTH
+        return collide_with_border or collide_with_terrain
+
     def reset(self):
         self._box.x = self._original_x
         self._box.y = self._original_y
@@ -145,6 +158,10 @@ class Player(Drawable, Moveable, Collidable, GameObject):
     def process_hp(self) -> None:
         #void damage
         if self._box.y >= self._level.get_box().height and self._game_session.get_state() == GameSession.GameSessionState.IN_GAME:
+            self._death_message = "Potato fell out of the world"
             self._hp_change_value = -100
         self._game_session.process_hp(self._hp_change_value)
         self._hp_change_value = 0
+
+    def get_death_message(self) -> str:
+        return self._death_message

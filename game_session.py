@@ -20,7 +20,6 @@ class GameSession:
     def process_hp(self, hp_change_value: float) -> None:
         self._hp += hp_change_value
         if self._hp <= 0:
-            print("sucks")
             self._game_session_state = self.GameSessionState.DEAD
             self._hp = 100
 
