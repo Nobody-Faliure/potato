@@ -28,12 +28,13 @@ class Player(Drawable, Collidable, GameObject):
                  gravity_acceleration: float,
                  jump_initial_velocity: float,
                  screen_proxy : ScreenProxy,
-                 game_session : GameSession):
+                 game_session : GameSession,
+                 speed: int):
         self._state = self.State.IN_THE_AIR
         self._gravity_acceleration = gravity_acceleration
         self._original_x = 320
         self._original_y = 0
-        self._box = pygame.Rect(self._original_x, self._original_y, PLAYER_WIDTH, PLAYER_HEIGHT)
+        self._box = pygame.Rect(0, 0, PLAYER_WIDTH, PLAYER_HEIGHT)
         self._level = level
         self._screen = screen
         self._jump_initial_velocity = jump_initial_velocity
@@ -59,6 +60,7 @@ class Player(Drawable, Collidable, GameObject):
         self._hp_change_value = 0
         self._death_message = None
         self._movement_key_pressed = self.MovementKeyPressed.NO_KEY
+        self._speed = speed
 
     def process_jumping_and_collision(self) -> None:
         # move horizontal
@@ -128,12 +130,12 @@ class Player(Drawable, Collidable, GameObject):
 
     def move_left(self):
         self._left_frame_index = (self._left_frame_index + 1) % 20
-        self._x_velocity = - 2
+        self._x_velocity = self._speed * -1
         self._movement_key_pressed = self.MovementKeyPressed.LEFT_KEY
 
     def move_right(self):
         self._right_frame_index = (self._right_frame_index + 1) % 20
-        self._x_velocity = + 2
+        self._x_velocity = self._speed
         self._movement_key_pressed = self.MovementKeyPressed.LEFT_KEY
 
     def jump(self):
@@ -152,14 +154,18 @@ class Player(Drawable, Collidable, GameObject):
         self._x_velocity = 0
         self._y_velocity = 0
         self._state = self.State.IN_THE_AIR
-        self._hp_change_value = 100
+        self._hp_change_value = 0
         self._game_session.change_state(GameSession.GameSessionState.IN_GAME)
+        self._screen_proxy.revert()
 
     def process_hp(self) -> None:
         #void damage
         if self._box.y >= self._level.get_box().height and self._game_session.get_state() == GameSession.GameSessionState.IN_GAME:
-            self._death_message = "Potato fell out of the world"
-            self._hp_change_value = -100
+            self._death_message = "Potato was yeeted into nonexistence"
+            self._hp_change_value = - 100
+        if self._box.y < 0 and self._game_session.get_state() == GameSession.GameSessionState.IN_GAME:
+            self._death_message = "Potato was yeeted into outer space"
+            self._hp_change_value = - 100
         self._game_session.process_hp(self._hp_change_value)
         self._hp_change_value = 0
 

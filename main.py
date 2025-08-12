@@ -19,22 +19,30 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 stopped = False
 
 # Create Level
-level_box = pygame.Rect(0, 0, screen_width, screen_height)
-screen_proxy = ScreenProxy(screen, level_box)
+level_box = pygame.Rect(0, 0, screen_width * 2, screen_height)
+
+screen_proxy = ScreenProxy(screen, level_box, screen_width)
+
 builders: list[TerrainBuilder] = [
     DirtAndStoneGroundSegment(level_box, 0, 10, 4, screen_proxy),
     DirtAndStoneGroundSegment(level_box, 11, 10, 7, screen_proxy),
-    DirtAndStoneGroundSegment(level_box, 22, 10, 4, screen_proxy),
+    DirtAndStoneGroundSegment(level_box, 22, 10, 7, screen_proxy),
     Forest(level_box, 0, 5, 10, screen_proxy),
+    DirtAndStoneGroundSegment(level_box, 33, 14, 6, screen_proxy),
+    DirtAndStoneGroundSegment(level_box, 48, 16, 8, screen_proxy),
 ]
 
 level = Level(level_box.h, level_box.w, level_box)
+
 for builder in builders:
     level.add_terrain_objects(builder.get_terrain_objects())
 
 # Create Player
 game_session = GameSession()
-player = Player(screen, level, 0.98, 15, screen_proxy, game_session)
+player = Player(screen, level, 0.98, 15, screen_proxy, game_session, 2)
+
+scroll_counter = 0
+scroll_range = 160
 
 big_font = pygame.font.Font("sprites/font.otf", 96)
 small_font = pygame.font.Font("sprites/font.otf", 32)
@@ -88,10 +96,7 @@ while not stopped:
     key_held = pygame.key.get_pressed()
 
     if game_session.get_state() == GameSession.GameSessionState.IN_GAME:
-        if key_held[pygame.K_j]:
-            screen_proxy.scroll(-5,0)
-        elif key_held[pygame.K_l]:
-            screen_proxy.scroll(5, 0)
+        screen_proxy.process_scrolling(player.get_box(), screen_width)
 
         if key_held[pygame.K_LEFT] or key_held[pygame.K_a]:
             player.move_left()
