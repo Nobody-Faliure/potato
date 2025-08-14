@@ -161,10 +161,7 @@ class Player(Drawable, Collidable, GameObject):
     def process_hp(self) -> None:
         #void damage
         if self._box.y >= self._level.get_box().height and self._game_session.get_state() == GameSession.GameSessionState.IN_GAME:
-            self._death_message = "Potato was yeeted into nonexistence"
-            self._hp_change_value = - 100
-        if self._box.y < 0 and self._game_session.get_state() == GameSession.GameSessionState.IN_GAME:
-            self._death_message = "Potato was yeeted into outer space"
+            self._death_message = "Potato fell into nonexistence"
             self._hp_change_value = - 100
         self._game_session.process_hp(self._hp_change_value)
         self._hp_change_value = 0
