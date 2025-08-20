@@ -1,6 +1,8 @@
-from typing import override, Optional, Union
+from __future__ import annotations
 
-from pygame import Vector2, Surface, Rect
+from typing import Optional
+
+from pygame import Vector2, Surface, Rect, SRCALPHA
 from node import Node
 
 # the root node of rendering tree
@@ -13,17 +15,14 @@ class RootNode(Node):
         self._viewport_rect: Rect = viewport_rect
         self._viewport: Optional[Surface] = None
 
-    @override
     def render(self) -> Surface:
-        return Surface(self._size)
+        return Surface(self._size, SRCALPHA)
 
-    @override
-    def get_collision_shape(self) -> Node.CollisionShape:
+    def get_collision_shape(self) -> super().CollisionShape:
         return super().get_collision_shape()
 
-    @override
     def transform(self, surface: Surface) -> Surface:
-        return super().transform()
+        return super().transform(surface)
 
     # viewport related functions
     def invalidate_viewport(self) -> None:
@@ -40,7 +39,7 @@ class RootNode(Node):
     def get_viewport_surface(self) -> Surface:
         if self._viewport is not None:
             return self._viewport
-        self._viewport = self.get_surface().subsurface(self._viewport_rect)
+        self._viewport = self.get_surface().subsurface(self._viewport_rect).convert_alpha()
         return self._viewport
 
 

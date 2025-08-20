@@ -44,7 +44,7 @@ class Node(ABC):
             return self._surface
         self._surface = self.render()
         for child in self._children:
-            child.get_surface().blit(self._surface, child._pos)
+            self._surface.blit(child.get_surface(), child._pos)
         self._surface = self.transform(self._surface)
-        return self._surface
+        return self._surface.convert_alpha()
 
