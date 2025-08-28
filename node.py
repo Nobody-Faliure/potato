@@ -7,8 +7,6 @@ from typing import Optional, Union, NewType
 from pygame import Vector2, Surface, Rect, Mask
 
 class Node(ABC):
-    CollisionShape: NewType("CollisionShape", Union[Rect, Mask, None])
-
     def __init__(self, pos: Vector2 = Vector2(0, 0)) -> None:
         self._surface: Optional[Surface] = None
         self._pos: Vector2 = pos
@@ -25,13 +23,7 @@ class Node(ABC):
     def render(self) -> Surface:
         pass
 
-    # override this function to provide collision shape, relative to local coordination
-    @abstractmethod
-    def get_collision_shape(self) -> CollisionShape:
-        return None
-
     # override this function to do transform for the surface from current Node and all children nodes
-    @abstractmethod
     def transform(self, surface: Surface) -> Surface:
         return surface
 

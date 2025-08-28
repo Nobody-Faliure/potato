@@ -18,12 +18,6 @@ class RootNode(Node):
     def render(self) -> Surface:
         return Surface(self._size, SRCALPHA)
 
-    def get_collision_shape(self) -> super().CollisionShape:
-        return super().get_collision_shape()
-
-    def transform(self, surface: Surface) -> Surface:
-        return super().transform(surface)
-
     # viewport related functions
     def invalidate_viewport(self) -> None:
         self._viewport = None
@@ -37,6 +31,7 @@ class RootNode(Node):
         return True
 
     def get_viewport_surface(self) -> Surface:
+        print(self._children)
         if self._viewport is not None:
             return self._viewport
         self._viewport = self.get_surface().subsurface(self._viewport_rect).convert_alpha()
