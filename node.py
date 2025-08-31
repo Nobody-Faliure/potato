@@ -30,8 +30,14 @@ class Node(ABC):
     # call render for current node and all children nodes, update the surface cache (aka. _surface in each node)
     def invalidate_surface(self) -> None:
         self._surface = None
+        current_node = self
+        print("Invalidated ", self)
+        while current_node._parent is not None:
+            current_node = current_node._parent
+            self._parent.invalidate_surface()
 
     def get_surface(self) -> Surface:
+        print("Getting Surface of ", self)
         if self._surface is not None:
             return self._surface
         self._surface = self.render()

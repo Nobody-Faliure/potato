@@ -6,6 +6,7 @@ import sys
 
 from root_node import RootNode
 from terrain_segment_node import TerrainSegment
+from player_node import PlayerNode
 
 pygame.init()
 screen_width, screen_height = 640, 480
@@ -17,6 +18,9 @@ root_node = RootNode(Vector2(640, 480), Rect(0, 0, 640, 480))
 terrain_segment_node = TerrainSegment(Vector2(0, 0), Vector2(20, 20))
 
 root_node.add_child(terrain_segment_node)
+
+player_node = PlayerNode()
+root_node.add_child(player_node)
 
 clock = pygame.time.Clock()
 
@@ -30,6 +34,8 @@ while running:
     screen.fill((135, 206, 235))
     viewport = root_node.get_viewport_surface()
     screen.blit(viewport, (0, 0))
+
+    player_node.process_movement()
 
     pygame.display.flip()
     clock.tick(60)

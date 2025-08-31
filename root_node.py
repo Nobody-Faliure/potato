@@ -16,6 +16,7 @@ class RootNode(Node):
         self._viewport: Optional[Surface] = None
 
     def render(self) -> Surface:
+        print("Root rendered")
         return Surface(self._size, SRCALPHA)
 
     # viewport related functions
@@ -31,8 +32,7 @@ class RootNode(Node):
         return True
 
     def get_viewport_surface(self) -> Surface:
-        print(self._children)
-        if self._viewport is not None:
+        if self._viewport is not None and self._surface is not None:
             return self._viewport
         self._viewport = self.get_surface().subsurface(self._viewport_rect).convert_alpha()
         return self._viewport
