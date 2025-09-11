@@ -10,7 +10,6 @@ class ScreenProxy:
         self._proxy_box = pygame.Rect(0, 0, screen.get_width(), screen.get_height())
         self._world_box = world_box
         self._scroll_buff = 120
-        self._scroll_counter = 0
         self._screen_width = screen_width
         self._scroll_counter = 0
         self._scroll_range = 160

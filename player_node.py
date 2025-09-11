@@ -2,8 +2,9 @@ import pygame
 from pygame import Vector2
 
 from node import Node
+from animation import Animation
 
-class PlayerNode(Node):
+class PlayerNode(Node, Animation):
     def __init__(self):
         super().__init__()
         self._pos = Vector2(100, 100)
@@ -17,32 +18,34 @@ class PlayerNode(Node):
                                                                     pygame.image.load("sprites/potato_right_3.png"),
                                                                     pygame.image.load("sprites/potato_right_4.png")]
         self._potato_standby: pygame.Surface = pygame.image.load("sprites/potato_standby.png").convert_alpha()
-        self._velocity: Vector2 = Vector2(0, 0)
-        self._max_x_velocity: float = 2
-        self._x_acceleration: float = 1
         self._gravity: float = 0.98
+        Animation.add_animation(self,
+                                "player movement x",
+                                0,
+                                None,
+                                1,
+                                False,
+                                False,
+                                self._pos.x,
+                                2)
 
     def render(self) -> pygame.Surface:
         print("Player Rendered")
         return self._potato_standby
 
     def process_movement(self) -> None:
-        # process user input
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self._velocity.x -= self._x_acceleration
+        if pygame.key.get_pressed()[pygame.K_LEFT]:
             self.invalidate_surface()
-        elif keys[pygame.K_RIGHT]:
-            self._velocity.x += self._x_acceleration
+            self.update_increment("player movement x", -0.2, False)
+        elif pygame.key.get_pressed()[pygame.K_RIGHT]:
             self.invalidate_surface()
+            self.update_increment("player movement x", 0.2, False)
         else:
-            self._velocity.x = 0
+            self.update_increment("player movement x", 0, True)
 
-        # process velocity
-        if self._velocity.x > 2:
-            self._velocity.x = 2
-        elif self._velocity.x < -2:
-            self._velocity.x = -2
-        self._pos.x += self._velocity.x
+        self.process_animation("player movement x")
+        self._pos.x = self.get_animated_value("player movement x")
+
+
 
 

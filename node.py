@@ -8,6 +8,7 @@ from pygame import Vector2, Surface, Rect, Mask
 
 class Node(ABC):
     def __init__(self, pos: Vector2 = Vector2(0, 0)) -> None:
+        super().__init__()
         self._surface: Optional[Surface] = None
         self._pos: Vector2 = pos
         self._parent: Optional[Node] = None
