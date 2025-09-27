@@ -18,5 +18,4 @@ class TerrainSegment(Node):
                 self.add_child(DirtNode(node_left_top))
 
     def render(self):
-        print("Terrain rendered")
         return Surface(self._size, SRCALPHA)
